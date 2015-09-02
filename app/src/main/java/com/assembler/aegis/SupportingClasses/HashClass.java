@@ -13,7 +13,8 @@ import java.security.SecureRandom;
 public class HashClass {
     private SharedPreferences prefs;
 
-    public String getSecurePassword(String passwordToHash, String salt, boolean newPassword) throws NoSuchAlgorithmException {
+
+    public String getSecurePassword(String passwordToHash, String salt, boolean newPassword, int numberofItterations) throws NoSuchAlgorithmException {
         String generatedPassword = null;
         MessageDigest md = MessageDigest.getInstance("MD5");
         md.update(salt.getBytes());
@@ -29,8 +30,12 @@ public class HashClass {
             prefs.edit().putString("PWSalt", salt).commit();
         }
 
-        if(newPassword)
-            prefs.edit().putString("PWHash", generatedPassword).commit();
+        if(numberofItterations > 0){
+            numberofItterations--;
+            getSecurePassword(generatedPassword, salt, false, numberofItterations);
+        } else {
+            prefs.edit().putString("PWHash", generatedPassword);
+        }
 
         return generatedPassword;
     }
