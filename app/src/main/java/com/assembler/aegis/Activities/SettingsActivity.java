@@ -109,12 +109,12 @@ public class SettingsActivity extends ActionBarActivity {
             @Override
             public void onClick(View v) {
                 try {
-                    if(hashClass.getSecurePassword(oldPassword.getText().toString(), prefs.getString("PWSalt", ""), false).equalsIgnoreCase(prefs.getString("PWHash", ""))) {
+                    if(hashClass.getSecurePassword(oldPassword.getText().toString(), prefs.getString("PWSalt", ""), false, 1000).equalsIgnoreCase(prefs.getString("PWHash", ""))) {
                         String jsonObject = libraryHandler.getApplicationAndPasswordJSONObject().toString();
                         aes = new AESEncryptionProvider(newPassword.getText().toString());
                         libraryHandler.setAESProvider(aes);
                         libraryHandler.saveNewPasswordLibrary(jsonObject);
-                        hashClass.getSecurePassword(newPassword.getText().toString(), prefs.getString("PWSalt", ""), true);
+                        hashClass.getSecurePassword(newPassword.getText().toString(), prefs.getString("PWSalt", ""), true, 1000);
                         Toast.makeText(getApplicationContext(), "Password updated", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getApplicationContext(), "Incorrect Password", Toast.LENGTH_SHORT).show();

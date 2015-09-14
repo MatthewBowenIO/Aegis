@@ -53,7 +53,7 @@ public class LaunchActivity extends ActionBarActivity {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     try{
-                                        hashClass.getSecurePassword(applicationPassword.getText().toString(), hashClass.getSalt(), false);
+                                        hashClass.getSecurePassword(applicationPassword.getText().toString(), hashClass.getSalt(), false, 1000);
                                         prefs.edit().putBoolean("PasswordCreated", true).commit();
                                         sendToMainActivity();
                                     } catch (Exception ex) {
@@ -62,7 +62,7 @@ public class LaunchActivity extends ActionBarActivity {
                                 }
                             });
                         } else {
-                            if(hashClass.getSecurePassword(applicationPassword.getText().toString(), prefs.getString("PWSalt", ""), false).equalsIgnoreCase(prefs.getString("PWHash", ""))) {
+                            if(hashClass.getSecurePassword(applicationPassword.getText().toString(), prefs.getString("PWSalt", ""), false, 1000).equalsIgnoreCase(prefs.getString("PWHash", ""))) {
                                 sendToMainActivity();
                             } else {
                                 createDialog("Nope", null);

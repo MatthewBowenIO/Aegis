@@ -1,11 +1,14 @@
 package com.assembler.aegis.SupportingClasses;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
+import com.assembler.aegis.SQLiteHandler.PasswordContract;
 import com.assembler.aegis.EncryptionProviders.AESEncryptionProvider;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
@@ -15,14 +18,28 @@ public class LibraryHandler {
     private JSONObject mJsonObject = new JSONObject();
     private SharedPreferences prefs;
     private AESEncryptionProvider aes;
+    private SQLiteDatabase mDb = null;
+    private Context context = null;
 
     public void addAndSaveApplicationAndPassword(String applicationName, String applicationPassword){
         try {
             mJsonObject.put(applicationName, applicationPassword);
-            prefs.edit().putString("AccountsLibrary", aes.encryptAsBase64(mJsonObject.toString())).commit();
+            prefs.edit().putString("AccountsLibrary", aes.encryptAsBase64(mJsonObject.toString())).apply();
         } catch (Exception ex){
             Log.e("AEGIS", ex.getMessage());
         }
+
+        new Runnable() {
+            public void run() {
+                PasswordContract.PasswordDbHelper db = new PasswordContract.PasswordDbHelper(context);
+                mDb = db.getWritableDatabase();
+            }
+        };
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(PasswordContract.PasswordEntry.COLUMN_NAME_APPLICATION, applicationName);
+        contentValues.put(PasswordContract.PasswordEntry.COLUMN_NAME_PASSWORDHASH, applicationPassword);
+        mDb.insert(PasswordContract.PasswordEntry.TABLE_NAME, PasswordContract.PasswordEntry.COLUMN_NAME_APPLICATION, contentValues);
     }
 
     public JSONObject getApplicationAndPasswordJSONObject(){
@@ -51,4 +68,6 @@ public class LibraryHandler {
     public void setAESProvider(AESEncryptionProvider aesProvider){
         aes = aesProvider;
     }
+
+    public void setApplicationContext(Context c) {context = c;}
 }
